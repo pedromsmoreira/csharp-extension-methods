@@ -17,11 +17,11 @@ env:
 mono: none
 os:
   - linux
-  # - osx
+  - osx
 osx_image: xcode8.2
 before_script:
-  - chmod a+x ./run-tests.sh
+  - chmod a+x ./scripts/run-tests.sh
   - dotnet restore
 script:
   - dotnet build
-  - ./run-tests.sh
+  - ./scripts/run-tests.sh
