@@ -1,9 +1,27 @@
-language: csharp
-dist: trusty
-sudo: required
-mono: none
-dotnet: 1.0.0-preview2-003121
+# language: csharp
+# dist: trusty
+# sudo: required
+# mono: none
+# dotnet: 1.0.0-preview2-003121
 
+# addons:
+  # apt:
+    # sources:
+    # - sourceline: 'deb [arch=amd64] https://apt-mo.trafficmanager.net/repos/dotnet-release/ trusty main'
+      # key_url: 'https://apt-mo.trafficmanager.net/keys/microsoft.asc'
+    # packages:
+    # - dotnet-dev-1.0.1
+
+# before_script:
+ # dotnet restore
+# script:
+ # dotnet build 
+ 
+ 
+language: csharp
+sudo: false
+dist: trusty
+dotnet: 1.0.0-preview2-003121
 addons:
   apt:
     sources:
@@ -11,8 +29,18 @@ addons:
       key_url: 'https://apt-mo.trafficmanager.net/keys/microsoft.asc'
     packages:
     - dotnet-dev-1.0.1
-
+env:
+  global:
+    - DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+    - DOTNET_CLI_TELEMETRY_OPTOUT: 1   
+    - TEMP: "$TRAVIS_BUILD_DIR/.temp"
+mono: none
+os:
+  - linux
+  - osx
+osx_image: xcode8.2
 before_script:
- dotnet restore
+  - dotnet restore
 script:
- dotnet build
+  - dotnet build
+  - ./scripts/run-tests.sh
