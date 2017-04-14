@@ -4,7 +4,7 @@ echo ""
 echo "Run tests..."
 echo ""
 
-for test in ./test/*/
+for test in ./tests/*/
 do
     echo "Testing $test"
     pushd "$test"
