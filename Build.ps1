@@ -34,7 +34,7 @@ $buildSuffix = @{ $true = "$($suffix)-$($commitHash)"; $false = "$($branch)-$($c
 
 exec { & dotnet build CsharpUtilitiesExtensions.sln -c Release --version-suffix=$buildSuffix -v q /nologo }
 
-Push-Location -Path .\test\Common.Extensions.Tests
+Push-Location -Path .\tests\Common.Extensions.Tests
 
 exec { & dotnet xunit -configuration Release }
 
