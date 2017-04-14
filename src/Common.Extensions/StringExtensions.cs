@@ -16,7 +16,7 @@
 
         public static int ToInt(this string str) => str.IsWhitespace() ? 0 : Convert.ToInt32(str);
 
-        public static short ToShort(this string str) => (short)(str.IsWhitespace() ? 0 : Convert.ToInt16(str));
+        public static short ToShort(this string str) => str.IsWhitespace() ? (short)0 : Convert.ToInt16(str);
 
         public static long ToLong(this string str) => str.IsWhitespace() ? 0 : Convert.ToInt64(str);
 
