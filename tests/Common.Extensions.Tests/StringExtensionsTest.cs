@@ -86,5 +86,15 @@ namespace Common.Extensions.Tests
             // Assert
             act.ShouldThrow<UriFormatException>();
         }
+
+        [Fact]
+        public void ToUri_NullString_ShouldThrowArgumentNullException()
+        {
+            // Act
+            Action act = () => ((string) null).ToUri();
+
+            // Assert
+            act.ShouldThrow<ArgumentNullException>();
+        }
     }
 }
