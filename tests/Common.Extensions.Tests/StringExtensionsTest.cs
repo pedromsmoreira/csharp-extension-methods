@@ -96,5 +96,120 @@ namespace Common.Extensions.Tests
             // Assert
             act.ShouldThrow<ArgumentNullException>();
         }
+
+        [Fact]
+        public void ToInt_ValidString_ShouldBe1()
+        {
+            // Act
+            "1".ToInt().Should().Be(1);
+        }
+
+        [Fact]
+        public void ToInt_InvalidString_ShouldThrowFormatException()
+        {
+            // Act
+            Action act = () => "a".ToInt();
+
+            // Assert
+            act.ShouldThrow<FormatException>();
+        }
+
+        [Fact]
+        public void ToInt_InvalidString_ShouldThrowOverflowException()
+        {
+            // Act
+            Action act = () => long.MinValue.ToString().ToInt();
+
+            // Assert
+            act.ShouldThrow<OverflowException>();
+        }
+
+        [Theory]
+        [InlineData(" ", 0)]
+        [InlineData(null, 0)]
+        [InlineData("", 0)]
+        public void ToInt_InvalidString_ShouldBe0(string str, int expected)
+        {
+            // Act
+            str.ToInt().Should().Be(expected);
+        }
+
+        [Fact]
+        public void ToShort_ValidString_ShouldBe1()
+        {
+            // Act
+            "1".ToShort().Should().Be(1);
+        }
+
+        [Fact]
+        public void ToShort_InvalidString_ShouldThrowFormatException()
+        {
+            // Act
+            Action act = () => "a".ToShort();
+
+            // Assert
+            act.ShouldThrow<FormatException>();
+        }
+
+        [Fact]
+        public void ToShort_InvalidString_ShouldThrowOverflowException()
+        {
+            // Act
+            Action act = () => int.MaxValue.ToString().ToShort();
+
+            // Assert
+            act.ShouldThrow<OverflowException>();
+        }
+
+        [Theory]
+        [InlineData(" ", 0)]
+        [InlineData(null, 0)]
+        [InlineData("", 0)]
+        public void ToShort_InvalidString_ShouldBe0(string str, short expected)
+        {
+            // Act
+            str.ToShort().Should().Be(expected);
+        }
+
+        [Fact]
+        public void ToLong_ValidString_ShouldBe1()
+        {
+            // Act
+            "1".ToShort().Should().Be(1);
+        }
+
+        [Fact]
+        public void ToLong_InvalidString_ShouldThrowFormatException()
+        {
+            // Act
+            Action act = () => "a".ToLong();
+
+            // Assert
+            act.ShouldThrow<FormatException>();
+        }
+
+        [Theory]
+        [InlineData(" ", 0)]
+        [InlineData(null, 0)]
+        [InlineData("", 0)]
+        public void ToLong_InvalidString_ShouldBe0(string str, long expected)
+        {
+            // Act
+            str.ToLong().Should().Be(expected);
+        }
+
+        [Fact]
+        public void ToBoolean_ValidStringIsTrue_ShouldBeTrue()
+        {
+            // Act
+            "true".ToBoolean().Should().BeTrue();
+        }
+
+        [Fact]
+        public void ToBoolean_ValidStringIsFalse_ShouldBeFalse()
+        {
+            // Act
+            "false".ToBoolean().Should().BeFalse();
+        }
     }
 }
