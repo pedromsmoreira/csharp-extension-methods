@@ -40,6 +40,7 @@ os:
   - osx
 osx_image: xcode8.2
 before_script:
+  - chmod a+x ./scripts/run-test.sh
   - dotnet restore
 script:
   - dotnet build
