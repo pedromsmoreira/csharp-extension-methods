@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-
+echo ""
+echo "Restoring Test Project"
+	dotnet restore ./tests/Common.Extensions.Tests/Common.Extensions.Tests.csproj
+echo ""
 echo ""
 echo "Run tests..."
 echo ""
