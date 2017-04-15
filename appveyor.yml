@@ -16,11 +16,21 @@ environment:
   # Disable sending usage data to Microsoft
   DOTNET_CLI_TELEMETRY_OPTOUT: true
  
+# build_script:
+# - ps: .\Build.ps1
+ 
 build_script:
-- ps: .\Build.ps1
- 
-test: off
- 
+  - dotnet restore
+  - dotnet build -c Release
+  - dotnet pack -c Release
+
+test_script:
+  - ps: .\scripts\run-tests.ps1
+  
+clone_depth: 1
+
+test: on
+
 artifacts:
 # Store NuGet packages
 - path: .\artifacts\**\*.nupkg

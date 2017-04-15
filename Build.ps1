@@ -1,45 +1,67 @@
-# Taken from psake https://github.com/psake/psake
+$ErrorActionPreference = "Stop"
 
-<#
-.SYNOPSIS
-  This is a helper function that runs a scriptblock and checks the PS variable $lastexitcode
-  to see if an error occcured. If an error is detected then an exception is thrown.
-  This function allows you to run command-line programs without having to
-  explicitly check the $lastexitcode variable.
-.EXAMPLE
-  exec { svn info $repository_trunk } "Error executing SVN. Please verify SVN command-line client is installed"
-#>
-function Exec
+function DownloadWithRetry([string] $url, [string] $downloadLocation, [int] $retries)
 {
-    [CmdletBinding()]
-    param(
-        [Parameter(Position=0,Mandatory=1)][scriptblock]$cmd,
-        [Parameter(Position=1,Mandatory=0)][string]$errorMessage = ($msgs.error_bad_command -f $cmd)
-    )
-    & $cmd
-    if ($lastexitcode -ne 0) {
-        throw ("Exec: " + $errorMessage)
+    while($true)
+    {
+        try
+        {
+            Invoke-WebRequest $url -OutFile $downloadLocation
+            break
+        }
+        catch
+        {
+            $exceptionMessage = $_.Exception.Message
+            Write-Host "Failed to download '$url': $exceptionMessage"
+            if ($retries -gt 0) {
+                $retries--
+                Write-Host "Waiting 10 seconds before retrying. Retries left: $retries"
+                Start-Sleep -Seconds 10
+
+            }
+            else
+            {
+                $exception = $_.Exception
+                throw $exception
+            }
+        }
     }
 }
 
-if(Test-Path .\artifacts) { Remove-Item .\artifacts -Force -Recurse }
+cd $PSScriptRoot
 
-exec { & dotnet restore }
+$repoFolder = $PSScriptRoot
+$env:REPO_FOLDER = $repoFolder
 
-$tag = $(git tag -l --points-at HEAD)
-$revision = @{ $true = "{0:00000}" -f [convert]::ToInt32("0" + $env:APPVEYOR_BUILD_NUMBER, 10); $false = "local" }[$env:APPVEYOR_BUILD_NUMBER -ne $NULL];
-$suffix = @{ $true = ""; $false = "ci-$revision"}[$tag -ne $NULL -and $revision -ne "local"]
-$commitHash = $(git rev-parse --short HEAD)
-$buildSuffix = @{ $true = "$($suffix)-$($commitHash)"; $false = "$($branch)-$($commitHash)" }[$suffix -ne ""]
+$koreBuildZip="https://github.com/aspnet/KoreBuild/archive/dev.zip"
+if ($env:KOREBUILD_ZIP)
+{
+    $koreBuildZip=$env:KOREBUILD_ZIP
+}
 
-exec { & dotnet build CsharpUtilitiesExtensions.sln -c Release --version-suffix=$buildSuffix -v q /nologo }
+$buildFolder = ".build"
+$buildFile="$buildFolder\KoreBuild.ps1"
 
-<#
-Push-Location -Path .\tests\Common.Extensions.Tests
+if (!(Test-Path $buildFolder)) {
+    Write-Host "Downloading KoreBuild from $koreBuildZip"
 
-exec { & dotnet xunit -configuration Release }
+    $tempFolder=$env:TEMP + "\KoreBuild-" + [guid]::NewGuid()
+    New-Item -Path "$tempFolder" -Type directory | Out-Null
 
-Pop-Location
-#>
+    $localZipFile="$tempFolder\korebuild.zip"
 
-exec { & dotnet pack .\src\Common.Extensions\Common.Extensions.csproj -c Release -o .\artifacts --include-symbols --no-build --version-suffix=$suffix }
+    DownloadWithRetry -url $koreBuildZip -downloadLocation $localZipFile -retries 6
+
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    [System.IO.Compression.ZipFile]::ExtractToDirectory($localZipFile, $tempFolder)
+
+    New-Item -Path "$buildFolder" -Type directory | Out-Null
+    copy-item "$tempFolder\**\build\*" $buildFolder -Recurse
+
+    # Cleanup
+    if (Test-Path $tempFolder) {
+        Remove-Item -Recurse -Force $tempFolder
+    }
+}
+
+&"$buildFile" @args
