@@ -16,8 +16,8 @@ environment:
   # Disable sending usage data to Microsoft
   DOTNET_CLI_TELEMETRY_OPTOUT: true
  
-build_script:
-- ps: .\Build.ps1
+# build_script:
+# - ps: .\Build.ps1
  
 build_script:
   - dotnet restore
