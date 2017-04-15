@@ -1,7 +1,7 @@
 language: csharp
 sudo: required
 dist: trusty
-dotnet: 1.0.0-preview3-004056
+dotnet: 1.1.0
 addons:
   apt:
     sources:
